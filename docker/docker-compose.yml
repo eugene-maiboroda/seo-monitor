@@ -25,6 +25,9 @@ services:
   backend:
     container_name: monitor-backend
 
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+
     build:
       context: ..
       dockerfile: Dockerfile
