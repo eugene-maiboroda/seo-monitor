@@ -3,7 +3,6 @@ package com.alert.parser;
 import com.alert.client.HttpFetchClient;
 import com.alert.domain.dto.FetchResult;
 import com.alert.domain.dto.PageAuditResult;
-import com.alert.domain.dto.PageStatus;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

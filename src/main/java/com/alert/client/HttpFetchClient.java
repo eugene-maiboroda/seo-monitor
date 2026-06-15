@@ -2,10 +2,8 @@ package com.alert.client;
 
 import com.alert.domain.dto.FetchResult;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.actuate.web.exchanges.HttpExchange;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 

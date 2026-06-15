@@ -1,7 +1,6 @@
 package com.alert.parser;
 
 import com.alert.client.HttpFetchClient;
-import com.alert.domain.dto.FetchResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
