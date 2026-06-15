@@ -1,0 +1,41 @@
+networks:
+  monitor-net:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: monitor-postgres
+    restart: unless-stopped
+
+    networks:
+      - monitor-net
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - monitor_postgres_data:/var/lib/postgresql/data
+
+  backend:
+    container_name: monitor-backend
+
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    networks:
+      - monitor-net
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+volumes:
+  monitor_postgres_data:
