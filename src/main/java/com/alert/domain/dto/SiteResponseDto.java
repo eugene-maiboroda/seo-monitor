@@ -6,6 +6,7 @@ import lombok.Builder;
 public record SiteResponseDto(
         Long id,
         String url,
-        String name
+        String name,
+        int intervalHours
 ) {
 }

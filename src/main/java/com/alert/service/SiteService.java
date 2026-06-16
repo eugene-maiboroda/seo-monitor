@@ -64,6 +64,7 @@ public class SiteService {
                 .id(savedEntity.getId())
                 .url(savedEntity.getUrl())
                 .name(savedEntity.getName())
+                .intervalHours(savedEntity.getCheckIntervalHours())
                 .build();
     }
 }
