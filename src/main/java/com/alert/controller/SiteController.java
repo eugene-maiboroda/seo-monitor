@@ -37,4 +37,9 @@ public class SiteController {
         return ResponseEntity.ok("Site deleted");
     }
 
+    @PatchMapping
+    public ResponseEntity<String> update(@RequestParam Long id, SiteRequestDto request) {
+        siteService.update(id, request);
+        return ResponseEntity.ok("Site updated");
+    }
 }

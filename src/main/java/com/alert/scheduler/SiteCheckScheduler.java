@@ -31,9 +31,9 @@ public class SiteCheckScheduler {
                 continue;
             }
 
-//            if (!shouldAudit(site)) {
-//                continue;
-//            }
+            if (!shouldAudit(site)) {
+                continue;
+            }
 
             auditService.audit(site);
             site.setLastCheckAt(LocalDateTime.now());

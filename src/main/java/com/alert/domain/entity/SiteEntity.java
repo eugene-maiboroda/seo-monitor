@@ -29,7 +29,7 @@ public class SiteEntity {
     private boolean enabled = true;
 
     @Builder.Default
-    private int checkIntervalHours = 6;
+    private int checkIntervalHours = 24;
 
     private LocalDateTime lastCheckAt;
 

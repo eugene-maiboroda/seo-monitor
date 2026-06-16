@@ -41,9 +41,19 @@ public class SiteService {
         siteRepository.deleteById(id);
     }
 
+    public void update(Long id, SiteRequestDto request) {
+        SiteEntity siteEntity = siteRepository.findById(id)
+                .orElseThrow(() -> new SiteNotFoundException("Site not found"));
+        siteEntity.setName(request.name());
+        siteEntity.setUrl(request.url());
+        siteEntity.setCheckIntervalHours(request.intervalHours());
+        siteRepository.save(siteEntity);
+    }
+
     private SiteEntity mapToEntity(SiteRequestDto request) {
         return SiteEntity.builder()
                 .name(request.name())
+                .checkIntervalHours(request.intervalHours())
                 .url(request.url())
                 .build();
 
