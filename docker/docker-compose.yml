@@ -16,7 +16,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
 
     ports:
-      - "${API_PORT}:8080"
+      - "${API_PORT}:{API_PORT}"
 
     networks:
       - seo-monitor-net
