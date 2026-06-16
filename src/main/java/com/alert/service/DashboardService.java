@@ -31,15 +31,14 @@ public class DashboardService {
         SiteEntity site = siteRepository.findById(siteId)
                 .orElseThrow(() -> new SiteNotFoundException("Site not found"));
 
-        LocalDateTime yesterday = LocalDateTime.now(clock).minusHours(24);
         LocalDateTime lastCheckAt = site.getLastCheckAt() != null ? site.getLastCheckAt() : LocalDateTime.MIN;
 
         return SummaryResponse.builder()
                 .pages(pageRepository.countBySiteId(siteId))
                 .noH1Page(pageRepository.countBySiteIdAndH1ExistsFalse(siteId))
-                .redirectPage(pageCheckRepository.countByRedirectedTrue(siteId))
-                .errorPage(pageCheckRepository.countBySiteIdAndErrorMessageIsNotNullAndCheckedAtAfter(siteId, yesterday))
-                .changesPage(pageCheckRepository.countBySiteIdAndH1ChangedTrueAndCheckedAtAfter(siteId, yesterday))
+                .redirectPage(pageRepository.countBySiteIdAndRedirectedTrue(siteId))
+                .errorPage(pageRepository.countBySiteIdAndErrorMessageIsNotNull(siteId))
+                .changesPage(pageCheckRepository.countBySiteId(siteId))
                 .lastAudit(lastCheckAt)
                 .build();
 
@@ -59,23 +58,26 @@ public class DashboardService {
     }
 
     public List<RedirectPageResponse> getRedirects(Long siteId) {
-        return pageCheckRepository.findBySiteIdAndRedirectedTrue(siteId).stream()
+        return pageRepository.findBySiteIdAndRedirectedTrue(siteId).stream()
                 .map(this::toRedirectPageResponse)
                 .toList();
     }
 
     public List<ErrorPageResponse> getErrors(Long siteId) {
-        LocalDateTime yesterday = LocalDateTime.now(clock).minusHours(24);
-        return pageCheckRepository.findBySiteIdAndErrorMessageIsNotNullAndCheckedAtAfter(siteId, yesterday).stream()
+        return pageRepository.findBySiteIdAndErrorMessageIsNotNull(siteId).stream()
                 .map(this::toErrorPageResponse)
                 .toList();
     }
 
-    public List<ChangedPageResponse> getChanges(Long siteId) {
-        LocalDateTime yesterday = LocalDateTime.now(clock).minusHours(24);
-        return pageCheckRepository.findBySiteIdAndH1ChangedTrueAndCheckedAtAfter(siteId, yesterday).stream()
-                .map(this::toChangedPageResponse)
-                .toList();
+    public Page<ChangedPageResponse> getChanges(Long siteId, Integer days, int page, int size) {
+        if (days == null) {
+            return pageCheckRepository.findBySiteId(siteId, PageRequest.of(page, size))
+                    .map(this::toChangedPageResponse);
+        }
+
+        LocalDateTime from = LocalDateTime.now(clock).minusDays(days);
+        return pageCheckRepository.findBySiteIdAndCheckedAtAfter(siteId, from, PageRequest.of(page, size))
+                .map(this::toChangedPageResponse);
     }
 
     private NoH1PageResponse toNoH1PageResponse(PageEntity pageEntity) {
@@ -84,27 +86,28 @@ public class DashboardService {
                 .build();
     }
 
-    private RedirectPageResponse toRedirectPageResponse(PageCheckEntity entity) {
+    private RedirectPageResponse toRedirectPageResponse(PageEntity entity) {
         return RedirectPageResponse.builder()
                 .url(entity.getUrl())
                 .redirectUrl(entity.getRedirectUrl())
-                .checkedAt(entity.getCheckedAt())
+                .checkedAt(entity.getLastCheckedAt())
                 .build();
     }
 
-    private ErrorPageResponse toErrorPageResponse(PageCheckEntity entity) {
+    private ErrorPageResponse toErrorPageResponse(PageEntity entity) {
         return ErrorPageResponse.builder()
                 .url(entity.getUrl())
                 .errorMessage(entity.getErrorMessage())
-                .checkedAt(entity.getCheckedAt())
+                .checkedAt(entity.getLastCheckedAt())
                 .build();
     }
 
     private ChangedPageResponse toChangedPageResponse(PageCheckEntity entity) {
         return ChangedPageResponse.builder()
                 .url(entity.getUrl())
-                .previousH1(entity.getPreviousH1())
-                .currentH1(entity.getCurrentH1())
+                .changeType(entity.getChangeType())
+                .oldValue(entity.getOldValue())
+                .newValue(entity.getNewValue())
                 .checkedAt(entity.getCheckedAt())
                 .build();
     }

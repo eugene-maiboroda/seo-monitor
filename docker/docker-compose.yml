@@ -1,15 +1,35 @@
+version: "3.3"
+
 networks:
-  monitor-net:
-    driver: bridge
+  seo-monitor-net:
 
 services:
-  postgres:
-    image: postgres:16
-    container_name: monitor-postgres
+  seo-monitor-backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
     restart: unless-stopped
 
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "${API_PORT}:8080"
+
     networks:
-      - monitor-net
+      - seo-monitor-net
+
+    depends_on:
+      - seo-monitor-postgres
+
+    env_file:
+      - .env
+
+  seo-monitor-postgres:
+    image: postgres:16
+    restart: unless-stopped
 
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -17,29 +37,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     ports:
-      - "5433:5432"
+      - "${POSTGRES_PORT}:5432"
+
+    networks:
+      - seo-monitor-net
 
     volumes:
-      - monitor_postgres_data:/var/lib/postgresql/data
+      - seo_monitor_postgres_data:/var/lib/postgresql/data
 
-  backend:
-    container_name: monitor-backend
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    networks:
-      - monitor-net
-    depends_on:
-      - postgres
-    env_file:
-      - .env
-    ports:
-      - "8081:8080"
 volumes:
-  monitor_postgres_data:
+  seo_monitor_postgres_data:

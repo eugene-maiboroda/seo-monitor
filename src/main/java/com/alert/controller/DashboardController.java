@@ -25,7 +25,7 @@ public class DashboardController {
                                        @RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "20") int size
     ) {
-    return dashboardService.getPages(siteId, page, size);
+        return dashboardService.getPages(siteId, page, size);
     }
 
 
@@ -45,7 +45,13 @@ public class DashboardController {
     }
 
     @GetMapping("{siteId}/changes")
-    public List<ChangedPageResponse> getChanges(@PathVariable Long siteId) {
-        return dashboardService.getChanges(siteId);
+    public Page<ChangedPageResponse> getChanges(
+            @PathVariable Long siteId,
+            @RequestParam(required = false) Integer days,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+
+    ) {
+        return dashboardService.getChanges(siteId, days, page, size);
     }
 }

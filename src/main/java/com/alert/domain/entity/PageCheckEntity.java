@@ -1,5 +1,6 @@
 package com.alert.domain.entity;
 
+import com.alert.domain.dto.PageChangeType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,28 +21,17 @@ public class PageCheckEntity {
     @SequenceGenerator(name = "page_check_sequence_generator", sequenceName = "page_check_id_seq", initialValue = 10000, allocationSize = 1)
     private Long id;
 
-    private String url;
-
     private Long pageId;
-
     private Long siteId;
 
-    @Column(length = 1000)
-    private String previousH1;
+    private String url;
 
-    @Column(length = 1000)
-    private String currentH1;
+    @Enumerated(EnumType.STRING)
+    private PageChangeType changeType;
 
-    private boolean h1Exists;
+    private String oldValue;
 
-    private boolean redirected;
-
-    private String redirectUrl;
-
-    private boolean h1Changed;
-
-    @Column(length = 1000)
-    private String errorMessage;
+    private String newValue;
 
     @CreationTimestamp
     private LocalDateTime checkedAt;

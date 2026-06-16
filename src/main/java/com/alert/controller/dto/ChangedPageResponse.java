@@ -1,5 +1,6 @@
 package com.alert.controller.dto;
 
+import com.alert.domain.dto.PageChangeType;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -7,8 +8,9 @@ import java.time.LocalDateTime;
 @Builder
 public record ChangedPageResponse(
         String url,
-        String previousH1,
-        String currentH1,
+        PageChangeType changeType,
+        String oldValue,
+        String newValue,
         LocalDateTime checkedAt
 ) {
 }

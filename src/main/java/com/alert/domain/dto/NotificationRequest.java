@@ -14,6 +14,8 @@ public record NotificationRequest(
         boolean sitemapExists,
         boolean robotsExists,
         boolean pageAuditPassed,
+        boolean pagesChanged,
 
-        String errorMessage
+        String errorMessage,
+        String dashboardUrl
 ) {}

@@ -31,6 +31,12 @@ public class PageEntity {
 
     private boolean h1Exists;
 
+    private boolean redirected;
+    private String redirectUrl;
+
+    @Column(length = 1000)
+    private String errorMessage;
+
     @UpdateTimestamp
     private LocalDateTime lastCheckedAt;
 
