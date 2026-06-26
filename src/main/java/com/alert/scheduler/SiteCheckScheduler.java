@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -20,6 +21,7 @@ public class SiteCheckScheduler {
 
     private final SiteRepository siteRepository;
     private final SiteAuditService auditService;
+    private static final ZoneId ZONE_ID = ZoneId.of("Europe/Kyiv");
 
     @Scheduled(fixedRateString = "${app.scheduler.fixed-rate-ms}")
     public void schedule() {
@@ -36,7 +38,7 @@ public class SiteCheckScheduler {
             }
 
             auditService.audit(site);
-            site.setLastCheckAt(LocalDateTime.now());
+            site.setLastCheckAt(LocalDateTime.now(ZONE_ID));
             siteRepository.save(site);
         }
 

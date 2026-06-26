@@ -6,13 +6,16 @@ import com.alert.domain.entity.CheckStatus;
 import com.alert.domain.entity.SiteCheckEntity;
 import com.alert.domain.entity.SiteEntity;
 import com.alert.parser.SiteHealthChecker;
+import com.alert.repository.PageRepository;
 import com.alert.repository.SiteCheckerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SiteAuditService {
@@ -21,16 +24,23 @@ public class SiteAuditService {
     private final PageService pageService;
     private final SiteCheckerRepository siteCheckerRepository;
     private final NotificationService notificationService;
+    private final PageRepository pageRepository;
 
     public void audit(SiteEntity site) {
         List<PageComparisonResult> pageAuditResults = Collections.emptyList();
         boolean pageAuditPassed = false;
-
+        long pagesCount = 0;
         SiteAuditResult siteAudit = healthChecker.audit(site.getUrl());
 
         if (siteAudit.siteAvailable() && siteAudit.sitemapExists()) {
-            pageAuditPassed = true;
-            pageAuditResults = pageService.audit(site);
+            try {
+                pageAuditResults = pageService.audit(site);
+                pageAuditPassed = true;
+                pagesCount = pageRepository.countBySiteId(site.getId());
+                log.info("Site {} audited. {} pages found.", site.getUrl(), pagesCount);
+            } catch (Exception e) {
+                log.warn("Page audit failed for site {}: {}", site.getUrl(), e.getMessage());
+            }
         }
         boolean changed = pageAuditResults.stream().anyMatch(PageComparisonResult::changed);
         SiteCheckEntity siteCheckEntity = SiteCheckEntity.builder()
@@ -41,6 +51,7 @@ public class SiteAuditService {
                 .pageAuditPassed(pageAuditPassed)
                 .status(checkStatus(siteAudit, pageAuditPassed, changed))
                 .errorMessage(siteAudit.error())
+                .pageCount(pagesCount)
                 .build();
 
         siteCheckerRepository.save(siteCheckEntity);

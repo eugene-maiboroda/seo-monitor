@@ -41,14 +41,11 @@ public class DashboardService {
                 .changesPage(pageCheckRepository.countBySiteId(siteId))
                 .lastAudit(lastCheckAt)
                 .build();
-
     }
 
     public Page<PageResponse> getPages(Long siteId, int page, int size) {
         return pageRepository.findBySiteId(siteId, PageRequest.of(page, size))
                 .map(this::toPageResponse);
-
-
     }
 
     public List<NoH1PageResponse> getNoH1(Long siteId) {

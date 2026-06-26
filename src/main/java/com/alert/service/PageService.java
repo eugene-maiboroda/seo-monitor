@@ -11,10 +11,12 @@ import com.alert.parser.SitemapParser;
 
 import com.alert.repository.PageRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PageService {
@@ -29,10 +31,19 @@ public class PageService {
         List<PageComparisonResult> results = new ArrayList<>();
         Set<String> urls = sitemapParser.getAllUrlFromSitemap(site.getUrl());
 
+        if (urls.isEmpty()) {
+            log.warn("Sitemap returned 0 URLs for site {}, skipping audit to prevent data loss", site.getUrl());
+            return results;
+        }
+
         for (String url : urls) {
             results.add(processPage(site, url));
         }
 
+        List<PageEntity> pages = pageRepository.findBySiteIdAndUrlNotIn(site.getId(), urls);
+        pages.forEach(page -> pageCheckService.logDeleted(page.getSiteId(), page.getUrl()));
+
+        pageRepository.deleteBySiteIdAndUrlNotIn(site.getId(), urls);
         return results;
     }
 
@@ -42,7 +53,7 @@ public class PageService {
         Optional<PageEntity> pageOpt = pageRepository.findBySiteIdAndUrl(site.getId(), url);
 
         if (pageOpt.isEmpty()) {
-            createNewPage(site, url, result);
+            pageCheckService.logAdded(createNewPage(site, url, result));
             return PageComparisonResult.noChanges();
         }
 
@@ -58,9 +69,8 @@ public class PageService {
 
     }
 
-
-    private void createNewPage(SiteEntity site, String url, PageAuditResult result) {
-        pageRepository.save(PageEntity.builder()
+    private PageEntity createNewPage(SiteEntity site, String url, PageAuditResult result) {
+        return pageRepository.save(PageEntity.builder()
                 .siteId(site.getId())
                 .url(url)
                 .currentH1(result.h1())

@@ -27,6 +27,8 @@ public class SiteCheckEntity {
     private boolean robotsExists;
     private boolean pageAuditPassed;
 
+    private long pageCount;
+
     @Enumerated(EnumType.STRING)
     private CheckStatus status;
 

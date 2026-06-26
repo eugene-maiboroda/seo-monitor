@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HttpSiteHealthChecker implements SiteHealthChecker {
 
-    private static final String SITE_MAP_URL = "/sitemap.xml";
+    private static final String SITE_MAP_URL = "/sitemap_index.xml";
     private static final String ROBOTS_TXT_URL = "/robots.txt";
 
     private final HttpFetchClient fetchClient;

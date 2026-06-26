@@ -56,7 +56,7 @@ public class SitemapParser {
             return maimUrls;
         } catch (Exception e) {
             log.error("{} sitemap: failed to fetch index: {}", sourceDomain, e.getMessage());
-            return Collections.emptySet();
+            throw new RuntimeException("Failed to fetch sitemap index for: " + sourceDomain, e);
         }
     }
 
