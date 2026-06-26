@@ -10,20 +10,23 @@ import ErrorState from '../components/ErrorState.jsx'
 
 const COLUMNS = [
   { key: 'url',        label: 'URL',         render: v => <UrlCell url={v} /> },
-  { key: 'previousH1', label: 'Previous H1' },
-  { key: 'currentH1',  label: 'Current H1' },
+  { key: 'changeType', label: 'Change Type' },
+  { key: 'oldValue',   label: 'Old Value' },
+  { key: 'newValue',   label: 'New Value' },
   { key: 'checkedAt',  label: 'Checked At',  render: v => formatDate(v) },
 ]
 
 export default function ChangesPage() {
   const { siteId } = useOutletContext()
-  const { data: rows, loading, error } = useApi(
+  const { data, loading, error } = useApi(
     () => api.getChanges(siteId),
     [siteId]
   )
 
   if (loading) return <LoadingState />
   if (error)   return <ErrorState message={error} />
+
+  const rows = data?.content
 
   return (
     <div>
