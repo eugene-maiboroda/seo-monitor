@@ -43,6 +43,12 @@ public class PageService {
         List<PageEntity> pages = pageRepository.findBySiteIdAndUrlNotIn(site.getId(), urls);
         pages.forEach(page -> pageCheckService.logDeleted(page.getSiteId(), page.getUrl()));
 
+        if (!pages.isEmpty()) {
+            results.add(PageComparisonResult.builder()
+                    .changed(true)
+                    .changes(List.of())
+                    .build());
+        }
         pageRepository.deleteBySiteIdAndUrlNotIn(site.getId(), urls);
         return results;
     }
@@ -54,7 +60,10 @@ public class PageService {
 
         if (pageOpt.isEmpty()) {
             pageCheckService.logAdded(createNewPage(site, url, result));
-            return PageComparisonResult.noChanges();
+            return PageComparisonResult.builder()
+                    .changed(true)
+                    .changes(List.of())
+                    .build();
         }
 
         PageEntity page = pageOpt.get();
