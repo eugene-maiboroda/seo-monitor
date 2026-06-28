@@ -13,6 +13,7 @@ import com.alert.repository.PageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -27,6 +28,7 @@ public class PageService {
 
     private final PageRepository pageRepository;
 
+    @Transactional
     public List<PageComparisonResult> audit(SiteEntity site) {
         List<PageComparisonResult> results = new ArrayList<>();
         Set<String> urls = sitemapParser.getAllUrlFromSitemap(site.getUrl());
