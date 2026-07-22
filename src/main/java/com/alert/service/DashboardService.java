@@ -68,12 +68,12 @@ public class DashboardService {
 
     public Page<ChangedPageResponse> getChanges(Long siteId, Integer days, int page, int size) {
         if (days == null) {
-            return pageCheckRepository.findBySiteId(siteId, PageRequest.of(page, size))
+            return pageCheckRepository.findBySiteIdOrderByCheckedAtDesc(siteId, PageRequest.of(page, size))
                     .map(this::toChangedPageResponse);
         }
 
         LocalDateTime from = LocalDateTime.now(clock).minusDays(days);
-        return pageCheckRepository.findBySiteIdAndCheckedAtAfter(siteId, from, PageRequest.of(page, size))
+        return pageCheckRepository.findBySiteIdAndCheckedAtAfterOrderByCheckedAtDesc(siteId, from, PageRequest.of(page, size))
                 .map(this::toChangedPageResponse);
     }
 

@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useApi } from '../hooks/useApi.js'
 import { api } from '../api/client.js'
 import { formatDate } from '../utils.js'
 import DataTable from '../components/DataTable.jsx'
+import Pagination from '../components/Pagination.jsx'
 import UrlCell from '../components/UrlCell.jsx'
 import LoadingState from '../components/LoadingState.jsx'
 import EmptyState from '../components/EmptyState.jsx'
@@ -18,23 +20,36 @@ const COLUMNS = [
 
 export default function ChangesPage() {
   const { siteId } = useOutletContext()
+  const [page, setPage] = useState(0)
+
   const { data, loading, error } = useApi(
-    () => api.getChanges(siteId),
-    [siteId]
+    () => api.getChanges(siteId, page),
+    [siteId, page]
   )
 
   if (loading) return <LoadingState />
   if (error)   return <ErrorState message={error} />
 
-  const rows = data?.content
+  const rows = data?.content ?? []
 
   return (
     <div>
       <h1 className="page-title">Changes</h1>
-      {!rows?.length
-        ? <EmptyState message="No changes detected" />
-        : <DataTable columns={COLUMNS} data={rows} />
-      }
+      {rows.length === 0 ? (
+        <EmptyState message="No changes detected" />
+      ) : (
+        <DataTable
+          columns={COLUMNS}
+          data={rows}
+          footer={
+            <Pagination
+              page={page}
+              totalPages={data?.totalPages ?? 1}
+              onPageChange={setPage}
+            />
+          }
+        />
+      )}
     </div>
   )
 }

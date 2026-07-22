@@ -53,6 +53,6 @@ public class SiteCheckScheduler {
 
         return site.getLastCheckAt()
                 .plusHours(site.getCheckIntervalHours())
-                .isBefore(LocalDateTime.now());
+                .isBefore(LocalDateTime.now(ZONE_ID));
     }
 }

@@ -14,5 +14,5 @@ export const api = {
   getNoH1:       (siteId)       => get(`/dashboard/${siteId}/no-h1`),
   getRedirects:  (siteId)       => get(`/dashboard/${siteId}/redirects`),
   getErrors:     (siteId)       => get(`/dashboard/${siteId}/errors`),
-  getChanges:    (siteId)       => get(`/dashboard/${siteId}/changes`),
+  getChanges:    (siteId, page) => get(`/dashboard/${siteId}/changes?page=${page}&size=20`),
 }

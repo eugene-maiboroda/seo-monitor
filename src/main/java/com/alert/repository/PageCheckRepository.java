@@ -13,7 +13,7 @@ public interface PageCheckRepository extends JpaRepository<PageCheckEntity, Long
 
         long countBySiteId(Long siteId);
 
-        Page<PageCheckEntity> findBySiteId(Long siteId, Pageable pageable);
-        Page<PageCheckEntity> findBySiteIdAndCheckedAtAfter(Long siteId, LocalDateTime checkedAt, Pageable pageable);
+        Page<PageCheckEntity> findBySiteIdOrderByCheckedAtDesc(Long siteId, Pageable pageable);
+        Page<PageCheckEntity> findBySiteIdAndCheckedAtAfterOrderByCheckedAtDesc(Long siteId, LocalDateTime checkedAt, Pageable pageable);
 
 }
