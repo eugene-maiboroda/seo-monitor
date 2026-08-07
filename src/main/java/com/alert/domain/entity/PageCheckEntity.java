@@ -24,13 +24,16 @@ public class PageCheckEntity {
     private Long pageId;
     private Long siteId;
 
+    @Column(columnDefinition = "TEXT")
     private String url;
 
     @Enumerated(EnumType.STRING)
     private PageChangeType changeType;
 
+    @Column(columnDefinition = "TEXT")
     private String oldValue;
 
+    @Column(columnDefinition = "TEXT")
     private String newValue;
 
     @CreationTimestamp
