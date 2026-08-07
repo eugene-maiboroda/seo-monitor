@@ -8,6 +8,8 @@ import com.alert.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -15,6 +17,8 @@ import java.util.List;
 public class SiteService {
 
     private final SiteRepository siteRepository;
+    private final SiteAuditService siteAuditService;
+    private static final ZoneId ZONE_ID = ZoneId.of("Europe/Kyiv");
 
     public SiteResponseDto create(SiteRequestDto request) {
         SiteEntity siteSaved = siteRepository.save(mapToEntity(request));
@@ -48,6 +52,21 @@ public class SiteService {
         siteEntity.setUrl(request.url());
         siteEntity.setCheckIntervalHours(request.intervalHours());
         siteRepository.save(siteEntity);
+    }
+
+    public void check(Long id) {
+        SiteEntity site = siteRepository.findById(id).orElseThrow(
+                () -> new SiteNotFoundException("Site not found")
+        );
+
+        if (!site.isEnabled()) {
+            throw new IllegalStateException("Site is disabled");
+        }
+
+        siteAuditService.audit(site);
+
+        site.setLastCheckAt(LocalDateTime.now(ZONE_ID));
+        siteRepository.save(site);
     }
 
     private SiteEntity mapToEntity(SiteRequestDto request) {

@@ -42,4 +42,10 @@ public class SiteController {
         siteService.update(id, request);
         return ResponseEntity.ok("Site updated");
     }
+
+    @PostMapping("/{id}/check")
+    public ResponseEntity<String> check(@PathVariable Long id) {
+        siteService.check(id);
+        return ResponseEntity.ok("Audit started");
+    }
 }

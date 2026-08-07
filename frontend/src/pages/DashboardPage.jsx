@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { useApi } from '../hooks/useApi.js'
 import { api } from '../api/client.js'
@@ -8,25 +9,47 @@ import ErrorState from '../components/ErrorState.jsx'
 
 export default function DashboardPage() {
   const { siteId } = useOutletContext()
+
   const { data: summary, loading, error } = useApi(
-    () => api.getSummary(siteId),
-    [siteId]
+      () => api.getSummary(siteId),
+      [siteId]
   )
 
+  const [auditLoading, setAuditLoading] = useState(false)
+
+  const runAudit = async () => {
+    setAuditLoading(true)
+
+    try {
+      await api.runAudit(siteId)
+    } finally {
+      setAuditLoading(false)
+    }
+  }
+
   if (loading) return <LoadingState />
-  if (error)   return <ErrorState message={error} />
+  if (error) return <ErrorState message={error} />
 
   return (
-    <div>
-      <h1 className="page-title">Dashboard</h1>
-      <div className="stat-grid">
-        <StatCard label="Pages"      value={summary?.pages}       to="pages" />
-        <StatCard label="No H1"      value={summary?.noH1Page}    to="no-h1" />
-        <StatCard label="Redirects"  value={summary?.redirectPage} to="redirects" />
-        <StatCard label="Errors"     value={summary?.errorPage}   to="errors" />
-        <StatCard label="Changes"    value={summary?.changesPage}  to="changes" />
-        <StatCard label="Last Audit" value={formatDate(summary?.lastAudit)} />
+      <div>
+        <h1 className="page-title">Dashboard</h1>
+
+        <div className="stat-grid">
+          <StatCard label="Pages" value={summary?.pages} to="pages" />
+          <StatCard label="No H1" value={summary?.noH1Page} to="no-h1" />
+          <StatCard label="Redirects" value={summary?.redirectPage} to="redirects" />
+          <StatCard label="Errors" value={summary?.errorPage} to="errors" />
+          <StatCard label="Changes" value={summary?.changesPage} to="changes" />
+          <StatCard label="Last Audit" value={formatDate(summary?.lastAudit)} />
+
+          <button
+              className="audit-button"
+              disabled={auditLoading}
+              onClick={runAudit}
+          >
+            {auditLoading ? "Running..." : "▶ Start Audit"}
+          </button>
+        </div>
       </div>
-    </div>
   )
 }
