@@ -23,18 +23,20 @@ public class PageEntity {
 
     private Long siteId;
 
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String currentH1;
 
     private boolean h1Exists;
 
     private boolean redirected;
+
+    @Column(columnDefinition = "TEXT")
     private String redirectUrl;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String errorMessage;
 
     @UpdateTimestamp
