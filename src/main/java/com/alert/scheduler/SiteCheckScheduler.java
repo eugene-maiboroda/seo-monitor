@@ -5,6 +5,7 @@ import com.alert.repository.SiteRepository;
 import com.alert.service.SiteAuditService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,9 +22,11 @@ public class SiteCheckScheduler {
 
     private final SiteRepository siteRepository;
     private final SiteAuditService auditService;
-    private static final ZoneId ZONE_ID = ZoneId.of("Europe/Kyiv");
 
-    @Scheduled(fixedRateString = "${app.scheduler.fixed-rate-ms}")
+    @Value("${app.scheduler.timezone}")
+    private String timeZona;
+
+    @Scheduled(cron = "${app.scheduler.cron}", zone = "${app.scheduler.timezone}")
     public void schedule() {
         log.info("Scheduled task started");
         List<SiteEntity> sites = siteRepository.findAll();
@@ -33,26 +36,12 @@ public class SiteCheckScheduler {
                 continue;
             }
 
-            if (!shouldAudit(site)) {
-                continue;
-            }
-
             auditService.audit(site);
-            site.setLastCheckAt(LocalDateTime.now(ZONE_ID));
+            site.setLastCheckAt(LocalDateTime.now(ZoneId.of(timeZona)));
             siteRepository.save(site);
         }
 
         log.info("Scheduled task finished");
 
-    }
-
-    private boolean shouldAudit(SiteEntity site) {
-        if (site.getLastCheckAt() == null) {
-            return true;
-        }
-
-        return site.getLastCheckAt()
-                .plusHours(site.getCheckIntervalHours())
-                .isBefore(LocalDateTime.now(ZONE_ID));
     }
 }

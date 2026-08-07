@@ -1,4 +1,4 @@
-package com.alert.config;
+package com.alert.booster;
 
 import lombok.Getter;
 import lombok.Setter;

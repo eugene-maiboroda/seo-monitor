@@ -1,6 +1,5 @@
 package com.alert.booster;
 
-import com.alert.config.AppProps;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

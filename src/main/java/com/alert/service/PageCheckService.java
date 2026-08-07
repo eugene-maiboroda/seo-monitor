@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class PageCheckService {
+    private static final int MAX_LOG_LENGTH = 1000;
 
     private final PageCheckRepository pageCheckRepository;
 
@@ -23,7 +24,7 @@ public class PageCheckService {
                                 .url(page.getUrl())
                                 .changeType(change.type())
                                 .oldValue(change.oldValue())
-                                .newValue(change.newValue())
+                                .newValue(truncate(change.newValue()))
                                 .build()
                 )
         );
@@ -49,5 +50,15 @@ public class PageCheckService {
                 .oldValue(null)
                 .newValue(null)
                 .build());
+    }
+
+    private String truncate(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.length() <= MAX_LOG_LENGTH
+                ? value
+                : value.substring(0, MAX_LOG_LENGTH);
     }
 }

@@ -21,6 +21,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PageService {
+    private static final int MAX_LOG_LENGTH = 1000;
 
     private final SitemapParser sitemapParser;
     private final PageParser pageParser;
@@ -88,7 +89,7 @@ public class PageService {
                 .h1Exists(result.h1Exists())
                 .redirected(result.redirected())
                 .redirectUrl(result.redirectUrl())
-                .errorMessage(result.error())
+                .errorMessage(truncate(result.error()))
                 .build());
     }
 
@@ -97,7 +98,7 @@ public class PageService {
         page.setH1Exists(result.h1Exists());
         page.setRedirected(result.redirected());
         page.setRedirectUrl(result.redirectUrl());
-        page.setErrorMessage(result.error());
+        page.setErrorMessage(truncate(result.error()));
 
         pageRepository.save(page);
     }
@@ -136,4 +137,14 @@ public class PageService {
                 .build();
 
     }
+    private String truncate(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.length() <= MAX_LOG_LENGTH
+                ? value
+                : value.substring(0, MAX_LOG_LENGTH);
+    }
+
 }
